@@ -116,18 +116,23 @@ function ComboboxContent({
   )
 }
 
-function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
-  return (
-    <ComboboxPrimitive.List
-      data-slot="combobox-list"
-      className={cn(
-        "no-scrollbar max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 p-1 data-empty:p-0 overflow-y-auto overscroll-contain",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxPrimitive.List.Props>(
+  ({ className, ...props }, ref) => {
+    return (
+      <ComboboxPrimitive.List
+        ref={ref}
+        data-slot="combobox-list"
+        className={cn(
+          "no-scrollbar max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 p-1 data-empty:p-0 overflow-y-auto overscroll-contain",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+
+ComboboxList.displayName = "ComboboxList"
 
 function ComboboxItem({
   className,

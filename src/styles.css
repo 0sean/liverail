@@ -122,7 +122,7 @@
     }
 
     body {
-        @apply font-sans bg-background text-foreground;
+        @apply font-sans bg-linear-to-br from-card to-background text-foreground h-svh w-screen;
     }
 
     html {

@@ -13,6 +13,9 @@ const config = defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    allowedHosts: ["surgeon-suite-policies-rachel.trycloudflare.com"]
+  },
   plugins: [
     tailwindcss(),
     devtools(),
