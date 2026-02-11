@@ -5,6 +5,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import { fileURLToPath, URL } from 'url'
 import { nitro } from 'nitro/vite'
+import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
   resolve: {
@@ -13,6 +14,7 @@ const config = defineConfig({
     },
   },
   plugins: [
+    tailwindcss(),
     devtools(),
     nitro(),
     // this is the plugin that enables path aliases
