@@ -4,7 +4,6 @@ import { getService as getServiceFn } from '@/functions'
 import { useQuery } from '@tanstack/react-query';
 import { IconArrowRight, IconLoader2 } from '@tabler/icons-react';
 import type { Service, Location } from '@/lib/rtt';
-import { Progress } from '@/components/ui/progress';
 import { formatDistanceExact, formatTime } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { compareAsc, compareDesc, intervalToDuration, parse } from 'date-fns';
@@ -80,11 +79,18 @@ function RefreshProgress({ intervalMs, cycleStartMs }: { intervalMs: number, cyc
 
   const elapsedMs = Math.max(0, nowMs - cycleStartMs);
   const progressValue = Math.min(100, (elapsedMs / intervalMs) * 100);
+  const progressDegrees = (progressValue / 100) * 360;
 
-  return <Progress
-    value={progressValue}
-    className="w-14 gap-0"
+  return <div
+    role="progressbar"
     aria-label="Query refresh progress"
+    aria-valuemin={0}
+    aria-valuemax={100}
+    aria-valuenow={Math.round(progressValue)}
+    className="size-3 shrink-0 rounded-full"
+    style={{
+      background: `conic-gradient(var(--primary) ${progressDegrees}deg, var(--muted) ${progressDegrees}deg)`
+    }}
   />;
 }
 
