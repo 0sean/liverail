@@ -103,12 +103,27 @@ function StationCombobox({
       return Stations;
     }
 
-    return Stations.filter((station) => {
+    const exactCodeMatches: StationData[] = [];
+    const otherMatches: StationData[] = [];
+
+    Stations.forEach((station) => {
       const normalizedName = station.stationName.toLowerCase();
       const normalizedCode = station.crsCode.toLowerCase();
+      const matchesQuery = normalizedName.includes(normalizedQuery) || normalizedCode.includes(normalizedQuery);
 
-      return normalizedName.includes(normalizedQuery) || normalizedCode.includes(normalizedQuery);
+      if (!matchesQuery) {
+        return;
+      }
+
+      if (normalizedCode === normalizedQuery) {
+        exactCodeMatches.push(station);
+        return;
+      }
+
+      otherMatches.push(station);
     });
+
+    return [...exactCodeMatches, ...otherMatches];
   }, [query]);
 
   const rowVirtualizer = useVirtualizer({
@@ -145,7 +160,9 @@ function StationCombobox({
   }, [filteredStations, rowVirtualizer]);
 
   return <Combobox
-    items={filteredStations}
+    items={Stations}
+    filteredItems={filteredStations}
+    autoHighlight
     virtualized
     itemToStringLabel={(station: StationData) => station.stationName}
     itemToStringValue={(station: StationData) => station.crsCode}
