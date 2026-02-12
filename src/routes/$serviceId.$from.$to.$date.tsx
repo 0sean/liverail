@@ -4,34 +4,53 @@ import { getService as getServiceFn } from '@/functions'
 import { useQuery } from '@tanstack/react-query';
 import { IconArrowRight, IconLoader2 } from '@tabler/icons-react';
 import type { Service, Location } from '@/lib/rtt';
+import { Progress } from '@/components/ui/progress';
 import { formatDistanceExact, formatTime } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { useStopwatch } from 'react-timer-hook';
 import { compareAsc, compareDesc, intervalToDuration, parse } from 'date-fns';
 
 export const Route = createFileRoute('/$serviceId/$from/$to/$date')({
   component: RouteComponent,
 })
 
+const QUERY_REFRESH_INTERVAL_MS = 30000;
+
 function RouteComponent() {
   const { serviceId, to, from, date } = Route.useParams();
 
   const getService = useServerFn(getServiceFn);
-  const { data } = useQuery({
+  const { data, dataUpdatedAt } = useQuery({
     queryKey: ["service", serviceId, date],
     queryFn: () => getService({ data: { serviceId, date } }),
-    refetchInterval: 30000,
-    staleTime: 30000
+    refetchInterval: QUERY_REFRESH_INTERVAL_MS,
+    staleTime: QUERY_REFRESH_INTERVAL_MS
   });
 
   return <div className="h-full w-full flex flex-col justify-center gap-8 p-6">
     {!data ? <IconLoader2 className="animate-spin text-muted-foreground" /> : <>
-      <Info data={data} to={to} />
+      <Info
+        data={data}
+        to={to}
+        refreshIntervalMs={QUERY_REFRESH_INTERVAL_MS}
+        refreshCycleStartMs={dataUpdatedAt}
+      />
       <ServiceState service={data} from={from} to={to} />
     </>}
   </div>
 }
 
-function Info({ data, to }: { data: Service, to: string }) {
+function Info({
+  data,
+  to,
+  refreshIntervalMs,
+  refreshCycleStartMs
+}: {
+  data: Service,
+  to: string,
+  refreshIntervalMs: number,
+  refreshCycleStartMs: number
+}) {
   const origin = data.locations.find((l) => l.displayAs === "ORIGIN" || l.displayAs === "STARTS") || data.locations[0]!;
   const destination = data.locations.find((l) => l.displayAs === "DESTINATION" || l.displayAs === "TERMINATES") || data.locations[data.locations.length - 1]!;
   const journeyDestination = data.locations.find((l) => l.crs.toLowerCase() === to.toLowerCase())!;
@@ -43,9 +62,42 @@ function Info({ data, to }: { data: Service, to: string }) {
     </div>
     <div className="fixed bottom-0 left-0 w-full p-6 flex justify-between items-center text-muted-foreground text-xs">
       <p>Arriving at {formatTime(journeyDestination.realtimeArrival || journeyDestination.gbttBookedArrival || journeyDestination.destination[0].publicTime)}</p>
-      <Link to="/" className="font-semibold hover:text-primary transition-colors">LiveRail</Link>
+      <div className="flex items-center gap-2">
+        <RefreshProgress intervalMs={refreshIntervalMs} cycleStartMs={refreshCycleStartMs} />
+        <Link to="/" className="font-semibold hover:text-primary transition-colors">LiveRail</Link>
+      </div>
     </div>
   </>
+}
+
+function RefreshProgress({ intervalMs, cycleStartMs }: { intervalMs: number, cycleStartMs: number }) {
+  const [initialOffsetTimestamp] = useState(() => {
+    const elapsedSecondsAtMount = Math.max(0, Math.floor((Date.now() - cycleStartMs) / 1000));
+    const timestamp = new Date();
+    timestamp.setSeconds(timestamp.getSeconds() - elapsedSecondsAtMount);
+    return timestamp;
+  });
+
+  const { seconds, minutes, hours, days, reset } = useStopwatch({
+    autoStart: true,
+    offsetTimestamp: initialOffsetTimestamp
+  });
+
+  useEffect(() => {
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - cycleStartMs) / 1000));
+    const nextOffsetTimestamp = new Date();
+    nextOffsetTimestamp.setSeconds(nextOffsetTimestamp.getSeconds() - elapsedSeconds);
+    reset(nextOffsetTimestamp, true);
+  }, [cycleStartMs, reset]);
+
+  const elapsedSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
+  const progressValue = Math.min(100, (elapsedSeconds * 1000 / intervalMs) * 100);
+
+  return <Progress
+    value={progressValue}
+    className="size-3"
+    aria-label="Query refresh progress"
+  />;
 }
 
 // Journey state
@@ -157,7 +209,7 @@ function Time({ realtime, booked, backup, now }: { realtime?: string, booked?: s
   return <Highlight>
     {formatDistanceExact(realtimeParsed, now)}
     {late === 1 && <span className="text-red-500 text-xs ml-1 align-top">+{interval?.minutes}</span>}
-    {late === -1 && <span className="text-green-500 text-xs ml-1 align-top">-{interval?.minutes}</span>}
+    {late === -1 && <span className="text-green-500 text-xs ml-1 align-top">{interval?.minutes}</span>}
   </Highlight>
 }
 
