@@ -15,7 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { LocationContainer } from "@/lib/rtt";
 import { Badge } from "@/components/ui/badge";
-import { compareDesc, formatDistance, isEqual, parse } from "date-fns";
+import { compareDesc, isEqual, parse } from "date-fns";
+import { formatDistanceExact, formatTime } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -230,19 +231,22 @@ function Timetable({ from, to }: { from: StationData, to: StationData }) {
   </>
 }
 
-function formatTime(date: string) {
-  return `${date.slice(0, 2)}:${date.slice(2, 4)}`;
-}
-
-function ServiceRow({ service }: { service: LocationContainer }) {
+function ServiceRow({ service, from, to }: { service: LocationContainer, from: StationData, to: StationData }) {
   const navigate = useNavigate();
   const realtimeDeparture = service.locationDetail.realtimeDeparture ? parse(service.locationDetail.realtimeDeparture, "HHmm", new Date()) : null;
   const bookedDeparture = service.locationDetail.gbttBookedDeparture ? parse(service.locationDetail.gbttBookedDeparture, "HHmm", new Date()) : null;
 
   // TODO: Realtime activated
+  // TODO: Fix scrolling
 
   return <TableRow className="cursor-pointer" onClick={() => navigate({
-    to: "/"
+    to: "/$serviceId/$from/$to/$date",
+    params: {
+      serviceId: service.serviceUid,
+      from: from.crsCode,
+      to: to.crsCode,
+      date: service.runDate,
+    },
   })}>
     <TableCell className="text-lg font-semibold w-4">{service.locationDetail.gbttBookedDeparture ? formatTime(service.locationDetail.gbttBookedDeparture) : `--:--`}</TableCell>
     <TableCell className="w-2"><IconArrowRight size={14} /></TableCell>
@@ -250,7 +254,7 @@ function ServiceRow({ service }: { service: LocationContainer }) {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <p className="font-semibold">{service.locationDetail.destination[service.locationDetail.destination.length - 1].description}</p>
-          {realtimeDeparture && bookedDeparture && <Badge className="text-[10px] p-1.5 h-4" variant="secondary">{isEqual(realtimeDeparture, bookedDeparture) ? "On time" : formatDistance(realtimeDeparture, bookedDeparture) + " " + (compareDesc(realtimeDeparture, bookedDeparture) === -1 ? "late" : "early")}</Badge>}
+          {realtimeDeparture && bookedDeparture && <Badge className="text-[10px] p-1.5 h-4" variant="secondary">{isEqual(realtimeDeparture, bookedDeparture) ? "On time" : formatDistanceExact(realtimeDeparture, bookedDeparture) + " " + (compareDesc(realtimeDeparture, bookedDeparture) === -1 ? "late" : "early")}</Badge>}
         </div>
         <p className="text-xs text-muted-foreground">{service.atocName} | Arrives at {service.locationDetail.realtimeArrival ? <>{service.locationDetail.gbttBookedArrival && service.locationDetail.gbttBookedArrival !== service.locationDetail.realtimeArrival && <span className="line-through">{formatTime(service.locationDetail.gbttBookedArrival)}</span>} {formatTime(service.locationDetail.realtimeArrival)}</> : (service.locationDetail.gbttBookedArrival ? formatTime(service.locationDetail.gbttBookedArrival) : `--:--`)}</p>
       </div>

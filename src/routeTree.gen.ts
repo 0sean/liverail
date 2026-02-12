@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServiceIdFromToDateRouteImport } from './routes/$serviceId.$from.$to.$date'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServiceIdFromToDateRoute = ServiceIdFromToDateRouteImport.update({
+  id: '/$serviceId/$from/$to/$date',
+  path: '/$serviceId/$from/$to/$date',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$serviceId/$from/$to/$date': typeof ServiceIdFromToDateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$serviceId/$from/$to/$date': typeof ServiceIdFromToDateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$serviceId/$from/$to/$date': typeof ServiceIdFromToDateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/$serviceId/$from/$to/$date'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/$serviceId/$from/$to/$date'
+  id: '__root__' | '/' | '/$serviceId/$from/$to/$date'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ServiceIdFromToDateRoute: typeof ServiceIdFromToDateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$serviceId/$from/$to/$date': {
+      id: '/$serviceId/$from/$to/$date'
+      path: '/$serviceId/$from/$to/$date'
+      fullPath: '/$serviceId/$from/$to/$date'
+      preLoaderRoute: typeof ServiceIdFromToDateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ServiceIdFromToDateRoute: ServiceIdFromToDateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

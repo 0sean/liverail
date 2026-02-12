@@ -15,7 +15,7 @@ export async function get<T>(url: string) {
 export type SearchContainer = {
     location: LocationDetail;
     filter: { destination: LocationDetail } | null;
-    services: LocationContainer[];
+    services: LocationContainer[] | null;
 }
 
 type LocationDetail = {
@@ -49,7 +49,7 @@ type Pair = {
     publicTime: string;
 }
 
-type Location = {
+export type Location = {
     realtimeActivated: boolean;
     tiploc: string;
     crs: string;
@@ -59,7 +59,7 @@ type Location = {
     origin: Pair[];
     destination: Pair[];
     isCall: boolean;
-    isCallPublic: boolean;
+    isPublicCall: boolean;
     realtimeArrival?: string;
     realtimeArrivalActual: boolean;
     realtimeArrivalNoReport: boolean;
@@ -76,4 +76,23 @@ type Location = {
     cancelReasonLongText?: string;
     displayAs: "CALL" | "PASS" | "ORIGIN" | "DESTINATION" | "STARTS" | "TERMINATES" | "CANCELLED_CALL" | "CANCELLED_PASS";
     serviceLocation?: "APPR_STAT" | "APPR_PLAT" | "AT_PLAT" | "DEP_PREP" | "DEP_READY"
+}
+
+export type Service = {
+    serviceUid: string;
+    runDate: string;
+    serviceType: "bus" | "ship" | "train";
+    isPassenger: boolean;
+    trainIdentity: string;
+    powerType: string;
+    trainClass?: string;
+    sleeper?: string;
+    atocCode: string;
+    atocName: string;
+    performanceMonitored: boolean;
+    origin: Pair[];
+    destination: Pair[];
+    locations: Location[];
+    realtimeActivated: boolean;
+    runningIdentity: string;
 }
