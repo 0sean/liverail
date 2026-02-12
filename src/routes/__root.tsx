@@ -38,21 +38,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            {
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-          ]}
-        />
         <Scripts />
       </body>
     </html>
