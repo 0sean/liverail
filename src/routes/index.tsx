@@ -18,9 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { compareDesc, isEqual, parse } from "date-fns";
 import { formatDistanceExact, formatTime } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({
-  component: App,
-});
+export const Route = createFileRoute("/")({ component: App });
 
 const STATION_ITEM_HEIGHT = 32;
 const STATION_LIST_OVERSCAN = 8;
@@ -29,69 +27,56 @@ function App() {
   const [from, setFrom] = useState<StationData | null>(null);
   const [to, setTo] = useState<StationData | null>(null);
 
-  return <div className="w-full min-h-screen px-6 py-10 md:py-12">
-    <div className="mx-auto w-full max-w-4xl flex flex-col gap-10">
-      <header className="flex items-center justify-center gap-3">
-        <h2 className="text-lg font-semibold">LiveRail</h2>
-        <p className="opacity-50 text-sm">Live UK train times</p>
-      </header>
-
-      <main className="flex flex-col items-center gap-8">
-        <section className="flex flex-col gap-2 items-center text-center">
-          <h1 className="text-3xl md:text-4xl font-semibold text-balance">Live UK train departures in real time</h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-2xl">Search any route in Great Britain to see live departure boards, platform updates, and delay changes without refreshing.</p>
-        </section>
-
-        <Card className="w-full md:w-fit">
-          <CardContent className="flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row gap-2 relative">
-              <StationCombobox
-                placeholder="From"
-                value={from}
-                onValueChange={setFrom}
-                icon={<IconMapPin />}
-              />
-              <Button className="hidden md:flex" variant="ghost" size="icon" onClick={() => {
-                setFrom(to);
-                setTo(from);
-              }}>
-                <IconArrowsLeftRight />
-              </Button>
-              <StationCombobox
-                placeholder="To"
-                value={to}
-                onValueChange={setTo}
-                icon={<IconDirections />}
-              />
-            </div>
-            <div className="flex justify-between md:items-end items-center gap-2">
-              <p className="text-[10px] md:text-xs text-muted-foreground">Works across all train operators in the UK.</p>
-              <Button className="md:hidden ml-auto opacity-50 hover:opacity-100 transition-opacity" variant="ghost" size="icon" onClick={() => {
-                setFrom(to);
-                setTo(from);
-              }}>
-                <IconArrowsLeftRight />
-              </Button>
-              <TimetableBrowser from={from} to={to}>
-                <Button className="self-end" disabled={!from || !to}>
-                  <IconTrain />
-                  Find my train
-                </Button>
-              </TimetableBrowser>
-            </div>
-          </CardContent>
-        </Card>
-
-        <section className="w-full max-w-3xl space-y-4 text-sm md:text-base">
-          <h2 className="text-xl md:text-2xl font-semibold">UK train tracker with live delay and platform updates</h2>
-          <p className="text-muted-foreground">LiveRail helps commuters and occasional travelers quickly check live train times between stations across Great Britain. You get scheduled and realtime departures, estimated arrival times, and platform information in one place.</p>
-          <p className="text-muted-foreground">Data is powered by Realtime Trains, with updates pulled frequently so you can spot late-running services and platform changes before you leave.</p>
-        </section>
-      </main>
-
-      <footer className="flex justify-center items-center py-2">
-        <p className="text-xs text-muted-foreground hover:text-foreground transition-colors text-center">A <a href="https://transit.fyi" target="_blank" rel="noopener noreferrer">Transit.fyi</a> project. Powered by <a href="https://realtimetrains.co.uk/" target="_blank" rel="noopener noreferrer">Realtime Trains</a></p>
-      </footer>
+  return <div className="h-full w-full flex flex-col justify-center items-center gap-8 p-6">
+    <div className="flex gap-4 absolute top-0 left-0 w-full justify-center items-center p-6">
+      <h2 className="text-lg font-semibold">LiveRail</h2>
+      <p className="opacity-30 text-sm">Live train times</p>
+    </div>
+    <div className="flex flex-col gap-2 items-center">
+      <h1 className="text-2xl font-semibold dark:text-shadow-lg">Where are you headed?</h1>
+      <p className="text-sm text-muted-foreground">Track your journey live. No refreshing. No surprises.</p>
+    </div>
+    <Card className="w-full md:w-fit">
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-2 relative">
+          <StationCombobox
+            placeholder="From"
+            value={from}
+            onValueChange={setFrom}
+            icon={<IconMapPin />}
+          />
+          <Button className="hidden md:flex" variant="ghost" size="icon" onClick={() => {
+            setFrom(to);
+            setTo(from);
+          }}>
+            <IconArrowsLeftRight />
+          </Button>
+          <StationCombobox
+            placeholder="To"
+            value={to}
+            onValueChange={setTo}
+            icon={<IconDirections />}
+          />
+        </div>
+        <div className="flex justify-between md:items-end items-center gap-2">
+          <p className="text-[10px] md:text-xs text-muted-foreground">Works across all train operators in the UK.</p>
+          <Button className="md:hidden ml-auto opacity-50 hover:opacity-100 transition-opacity" variant="ghost" size="icon" onClick={() => {
+            setFrom(to);
+            setTo(from);
+          }}>
+            <IconArrowsLeftRight />
+          </Button>
+          <TimetableBrowser from={from} to={to}>
+            <Button className="self-end" disabled={!from || !to}>
+              <IconTrain />
+              Find my train
+            </Button>
+          </TimetableBrowser>
+        </div>
+      </CardContent>
+    </Card>
+    <div className="flex absolute bottom-0 left-0 w-full justify-center items-center p-6">
+      <p className="text-xs text-muted-foreground hover:text-foreground transition-colors">A <a href="https://transit.fyi" target="_blank" rel="noopener noreferrer">Transit.fyi</a> project. Powered by <a href="https://realtimetrains.co.uk/" target="_blank" rel="noopener noreferrer">Realtime Trains</a></p>
     </div>
   </div>;
 }
