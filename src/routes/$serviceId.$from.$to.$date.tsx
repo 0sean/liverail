@@ -7,7 +7,6 @@ import type { Service, Location } from '@/lib/rtt';
 import { Progress } from '@/components/ui/progress';
 import { formatDistanceExact, formatTime } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { useStopwatch } from 'react-timer-hook';
 import { compareAsc, compareDesc, intervalToDuration, parse } from 'date-fns';
 
 export const Route = createFileRoute('/$serviceId/$from/$to/$date')({
@@ -71,31 +70,20 @@ function Info({
 }
 
 function RefreshProgress({ intervalMs, cycleStartMs }: { intervalMs: number, cycleStartMs: number }) {
-  const [initialOffsetTimestamp] = useState(() => {
-    const elapsedSecondsAtMount = Math.max(0, Math.floor((Date.now() - cycleStartMs) / 1000));
-    const timestamp = new Date();
-    timestamp.setSeconds(timestamp.getSeconds() - elapsedSecondsAtMount);
-    return timestamp;
-  });
-
-  const { seconds, minutes, hours, days, reset } = useStopwatch({
-    autoStart: true,
-    offsetTimestamp: initialOffsetTimestamp
-  });
+  const [nowMs, setNowMs] = useState(() => cycleStartMs);
 
   useEffect(() => {
-    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - cycleStartMs) / 1000));
-    const nextOffsetTimestamp = new Date();
-    nextOffsetTimestamp.setSeconds(nextOffsetTimestamp.getSeconds() - elapsedSeconds);
-    reset(nextOffsetTimestamp, true);
-  }, [cycleStartMs, reset]);
+    setNowMs(Date.now());
+    const tick = setInterval(() => setNowMs(Date.now()), 250);
+    return () => clearInterval(tick);
+  }, [cycleStartMs]);
 
-  const elapsedSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
-  const progressValue = Math.min(100, (elapsedSeconds * 1000 / intervalMs) * 100);
+  const elapsedMs = Math.max(0, nowMs - cycleStartMs);
+  const progressValue = Math.min(100, (elapsedMs / intervalMs) * 100);
 
   return <Progress
     value={progressValue}
-    className="size-3"
+    className="w-14 gap-0"
     aria-label="Query refresh progress"
   />;
 }
