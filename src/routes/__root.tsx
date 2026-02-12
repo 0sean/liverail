@@ -1,9 +1,10 @@
 import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
+
+const SITE_URL = process.env.SITE_URL || "https://live.transit.fyi";
+const SEO_TITLE = "LiveRail";
+const SEO_DESCRIPTION = "Track your journey live. No surprises.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -62,6 +63,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: '/apple-touch-icon.png',
       },
     ],
+    head: () => ({
+      meta: [
+        { title: SEO_TITLE },
+        { name: "description", content: SEO_DESCRIPTION },
+        { name: "robots", content: "index, follow" },
+        { name: "keywords", content: "live train times, UK train departures, train delay checker, train platform updates, rail tracker" },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: SEO_TITLE },
+        { property: "og:description", content: SEO_DESCRIPTION },
+        { property: "og:url", content: `${SITE_URL}/` },
+        { property: "og:site_name", content: "LiveRail" },
+        { property: "og:image", content: `${SITE_URL}/logo512.png` },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: SEO_TITLE },
+        { name: "twitter:description", content: SEO_DESCRIPTION },
+        { name: "twitter:image", content: `${SITE_URL}/logo512.png` },
+      ],
+      links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    }),
   }),
 
   shellComponent: RootDocument,

@@ -18,31 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { compareDesc, isEqual, parse } from "date-fns";
 import { formatDistanceExact, formatTime } from "@/lib/utils";
 
-const SITE_URL = process.env.SITE_URL || "https://live.transit.fyi";
-const SEO_TITLE = "LiveRail";
-const SEO_DESCRIPTION =
-  "Track your journey live. No surprises.";
-
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: SEO_TITLE },
-      { name: "description", content: SEO_DESCRIPTION },
-      { name: "robots", content: "index, follow" },
-      { name: "keywords", content: "live train times, UK train departures, train delay checker, train platform updates, rail tracker" },
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: SEO_TITLE },
-      { property: "og:description", content: SEO_DESCRIPTION },
-      { property: "og:url", content: `${SITE_URL}/` },
-      { property: "og:site_name", content: "LiveRail" },
-      { property: "og:image", content: `${SITE_URL}/logo512.png` },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: SEO_TITLE },
-      { name: "twitter:description", content: SEO_DESCRIPTION },
-      { name: "twitter:image", content: `${SITE_URL}/logo512.png` },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
-  }),
   component: App,
 });
 
@@ -54,11 +30,6 @@ function App() {
   const [to, setTo] = useState<StationData | null>(null);
 
   return <div className="w-full min-h-screen px-6 py-10 md:py-12">
-    <script
-      type="application/ld+json"
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(seoStructuredData) }}
-    />
     <div className="mx-auto w-full max-w-4xl flex flex-col gap-10">
       <header className="flex items-center justify-center gap-3">
         <h2 className="text-lg font-semibold">LiveRail</h2>
