@@ -4,6 +4,10 @@ export async function get<T>(url: string) {
         headers: {
             "Authorization": `Basic ${auth}`,
         },
+        cf: {
+            cacheEverything: true,
+            cacheTtl: 10
+        }
     });
     if (!r.ok) {
         const text = await r.text();
