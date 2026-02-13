@@ -8,6 +8,7 @@ import type { Service, Location } from '@/lib/rtt';
 import { formatDistanceExact, formatTime } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { compareAsc, compareDesc, intervalToDuration, parse } from 'date-fns';
+import clsx from 'clsx';
 
 export const Route = createFileRoute('/$serviceId/$from/$to/$date')({
   component: RouteComponent,
@@ -203,8 +204,8 @@ function Heading({ children }: { children: React.ReactNode }) {
   return <p className="text-zinc-500 text-xl font-semibold w-full max-w-128 md:max-w-192">{children}</p>;
 }
 
-function Highlight({ children }: { children: React.ReactNode }) {
-  return <span className="text-primary">{children}</span>;
+function Highlight({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <span className={clsx("text-primary", className)}>{children}</span>;
 }
 
 function Subtitle({ children }: { children: React.ReactNode }) {
@@ -226,9 +227,9 @@ function Time({ realtime, booked, backup, now }: { realtime?: string, booked?: s
   const late = compareAsc(realtimeParsed, bookedParsed);
   const interval = intervalToDuration({ start: bookedParsed, end: realtimeParsed });
 
-  return <Highlight>
+  return <Highlight className={clsx(late === 1 && "bg-gradient-to-b bg-clip-text from-red-200 to-red-400 text-transparent")}>
     {formatDistanceExact(realtimeParsed, now)}
-    {late === 1 && <span className="text-red-500 text-xs ml-1 align-top">+{interval?.minutes}</span>}
+    {late === 1 && <span className="text-xs ml-1 align-top">+{interval?.minutes}</span>}
     {late === -1 && <span className="text-green-500 text-xs ml-1 align-top">{interval?.minutes}</span>}
   </Highlight>
 }
