@@ -109,11 +109,11 @@ function getState(service: Service, from: string, to: string) {
   if (journeyDestination.displayAs.startsWith("CANCELLED")) return { state: "CANCELLED" as const };
   if (!nextStop) return { state: "ARRIVED" as const };
   if (!currentStop) return { state: "NEXT_STOP" as const, nextStop };
+  if (originStop.crs === nextStop.crs) return { state: "AWAITING_START" as const, nextStop };
   if (awaitingStations.includes(currentStop.crs.toLowerCase()) || (currentStop.crs === nextStop.crs && currentStop.crs.toLowerCase() === from.toLowerCase())) return { state: "AWAITING" as const };
-  if (currentStop?.serviceLocation && !currentStop.serviceLocation.startsWith("APPR")) return { state: "STOPPED" as const, currentStop };
   if (nextStop.crs.toLowerCase() === to.toLowerCase()) return { state: "ARRIVING" as const, nextStop };
   if (arrivedStations.includes(currentStop.crs.toLowerCase())) return { state: "ARRIVED" as const };
-  if (originStop.crs === nextStop.crs) return { state: "AWAITING_START" as const, nextStop };
+  if (currentStop?.serviceLocation && !currentStop.serviceLocation.startsWith("APPR")) return { state: "STOPPED" as const, currentStop };
   return { state: "NEXT_STOP" as const, nextStop };
 }
 
