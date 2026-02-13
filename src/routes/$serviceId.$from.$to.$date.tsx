@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { AnimatePresence, motion } from 'motion/react'
 import { useServerFn } from '@tanstack/react-start'
 import { getService as getServiceFn } from '@/functions'
 import { useQuery } from '@tanstack/react-query';
@@ -120,24 +121,40 @@ function getState(service: Service, from: string, to: string) {
 function ServiceState({ service, from, to }: { service: Service, from: string, to: string }) {
   const { state, nextStop, currentStop } = getState(service, from, to);
 
+  let content: React.ReactNode;
   switch (state) {
     case "AWAITING_START":
-      return <AwaitingStart stop={nextStop} />;
+      content = <AwaitingStart stop={nextStop} />; break;
     case "AWAITING":
-      return <Awaiting service={service} from={from} />;
+      content = <Awaiting service={service} from={from} />; break;
     case "NEXT_STOP":
-      return <NextStop stop={nextStop} />;
+      content = <NextStop stop={nextStop} />; break;
     case "STOPPED":
-      return <Stopped stop={currentStop} />;
+      content = <Stopped stop={currentStop} />; break;
     case "ARRIVING":
-      return <Arriving stop={nextStop} />;
+      content = <Arriving stop={nextStop} />; break;
     case "ARRIVED":
-      return <Arrived service={service} to={to} />;
+      content = <Arrived service={service} to={to} />; break;
     case "CANCELLED":
-      return <Cancelled service={service} />;
+      content = <Cancelled service={service} />; break;
     default:
-      return <NextStop stop={nextStop} />;
+      content = <NextStop stop={nextStop} />;
   }
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={state}
+        initial={{ opacity: 0, x: -32 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -32 }}
+        transition={{ duration: 0.6, ease: [0.85, 0, 0.15, 1] }}
+      >
+        {content}
+      </motion.div>
+      {import.meta.env.DEV && <p className="text-[8px] font-medium text-muted-foreground fixed bottom-3 right-6 opacity-50">{state}</p>}
+    </AnimatePresence>
+  );
 }
 
 // UI utils
@@ -191,7 +208,16 @@ function Highlight({ children }: { children: React.ReactNode }) {
 }
 
 function Subtitle({ children }: { children: React.ReactNode }) {
-  return <p className="text-zinc-400 dark:text-zinc-600 text-xs absolute -top-4 left-0">{children}</p>;
+  return (
+    <motion.p
+      className="text-zinc-400 dark:text-zinc-600 text-xs absolute -top-4 left-0"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.85, 0, 0.15, 1] }}
+    >
+      {children}
+    </motion.p>
+  );
 }
 
 function Time({ realtime, booked, backup, now }: { realtime?: string, booked?: string, backup: string, now: Date }) {
