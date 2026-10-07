@@ -3,8 +3,8 @@
 // Runtime types generated with workerd@1.20260212.0 2026-02-12 nodejs_compat
 declare namespace Cloudflare {
 	interface Env {
-		RTT_USERNAME: string;
-		RTT_PASSWORD: string;
+		RTT_API_KEY: string;
+		RTT_TOKEN_CACHE: KVNamespace;
 	}
 }
 interface Env extends Cloudflare.Env {}
@@ -12,7 +12,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "RTT_USERNAME" | "RTT_PASSWORD">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "RTT_API_KEY">> {}
 }
 
 // Begin runtime types
