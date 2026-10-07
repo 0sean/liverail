@@ -193,6 +193,8 @@ function formatLocation(serviceLocation: Location["serviceLocation"]) {
       return "Preparing to depart";
     case "DEP_READY":
       return "Ready to depart";
+    case "DEPARTING":
+      return "Departing";
     default:
       return "";
   }
@@ -276,7 +278,7 @@ function Stopped({ stop }: { stop: Location }) {
   const timePassed = compareDesc(now, departureTime) !== 1;
 
   return <div className="relative">
-    {stop.serviceLocation && stop.serviceLocation.startsWith("DEP_") && <Subtitle>{formatLocation(stop.serviceLocation)}</Subtitle>}
+    {stop.serviceLocation && stop.serviceLocation.startsWith("DEP") && <Subtitle>{formatLocation(stop.serviceLocation)}</Subtitle>}
     <Heading>Stopped in <Highlight>{stop.description}</Highlight>, leaving {timePassed ? "now" : <Time realtime={stop.realtimeDeparture} booked={stop.gbttBookedDeparture} backup={stop.origin[0].publicTime} now={now} />}</Heading>
   </div>
 }

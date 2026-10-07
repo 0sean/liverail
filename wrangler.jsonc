@@ -6,6 +6,9 @@
         "nodejs_compat"
     ],
     "main": "@tanstack/react-start/server-entry",
+    "kv_namespaces": [
+        { "binding": "RTT_TOKEN_CACHE" }
+    ],
     "observability": {
         "enabled": false,
         "head_sampling_rate": 1,
